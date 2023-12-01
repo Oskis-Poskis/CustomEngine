@@ -1,0 +1,13 @@
+{
+  "editor.mouseWheelZoom": true,
+  "window.zoomLevel": 1,
+  "files.exclude": {
+    "obj": true,
+    "bin\\Debug\\net7.0": true,
+    "bin\\Debug": true,
+    "bin": true,
+    ".vscode": true,
+    "Engine.sln": true,
+    "CustomEngine.sln": true
+  }
+}
