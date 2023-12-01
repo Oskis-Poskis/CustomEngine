@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <ItemGroup>
-    <ProjectReference Include="..\OpenTK-Template\OpenTK-Template.csproj" />
+    <ProjectReference Include="..\OpenTK_Template\OpenTK-Template.csproj"/>
   </ItemGroup>
 
   <PropertyGroup>
