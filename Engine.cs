@@ -70,7 +70,7 @@ namespace Engine
 
         private static unsafe void Scrolling(Window* window, double offsetX, double offsetY)
         {
-            viewport_camera.Input(new Vector2((float)offsetX, (float)offsetY) * 50.0f);
+            viewport_camera.Input(new Vector2((float)offsetX, (float)offsetY) * 50.0f, true);
         }
 
         protected override void OnUpdateFrame(FrameEventArgs args)
@@ -80,7 +80,7 @@ namespace Engine
             viewport_camera.Move((float)args.Time, KeyboardState);
 
             CursorState = (IsMouseButtonDown(MouseButton.Button2) || IsKeyDown(Keys.LeftAlt)) ? CursorState.Grabbed : CursorState.Normal;
-            if (CursorState == CursorState.Grabbed) viewport_camera.Input(MouseState.Delta);
+            if (CursorState == CursorState.Grabbed) viewport_camera.Input(MouseState.Delta, false);
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
