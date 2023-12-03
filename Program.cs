@@ -9,7 +9,7 @@ namespace Engine
         {
             NativeWindowSettings window_settings = new()
             {
-                Vsync = VSyncMode.Off,
+                Vsync = VSyncMode.On,
                 StartVisible = false,
                 StartFocused = true,
                 API = ContextAPI.OpenGL,

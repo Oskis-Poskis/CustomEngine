@@ -20,9 +20,4 @@
     </Content>
   </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="AssimpNet" Version="4.1.0" />
-    <PackageReference Include="STBImageSharp" Version="2.27.13" />
-  </ItemGroup>
-
 </Project>
