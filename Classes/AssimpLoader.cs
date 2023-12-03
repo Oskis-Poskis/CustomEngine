@@ -1,8 +1,7 @@
 using Assimp;
 using OpenTK.Mathematics;
 
-using Engine.Scene;
-using WindowTemplate.Common;    
+using Engine.Scene; 
 
 namespace Engine.Common
 {
@@ -10,8 +9,6 @@ namespace Engine.Common
     {
         public static void LoadMesh(string path, out VertexData[] loaded_vertices, out uint[] loaded_indicies)
         {
-            DllResolver.InitLoader();
-
             var importer = new AssimpContext();
             var scene = importer.ImportFile(path,
                 PostProcessPreset.TargetRealTimeMaximumQuality |

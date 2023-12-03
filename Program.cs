@@ -16,7 +16,7 @@ namespace Engine
                 Profile = ContextProfile.Core,
                 APIVersion = new Version(4, 6),
                 Flags = ContextFlags.Debug,
-                Title = "title"
+                Title = "Custom Engine"
             };
 
             AppWindow window = new AppWindow(window_settings, true);

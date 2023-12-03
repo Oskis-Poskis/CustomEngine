@@ -25,7 +25,7 @@ namespace Engine.Common
         private readonly float movement_interp_speed = 10.0f;
         private readonly float camera_interp_speed = 15.0f;
 
-        public static bool ShowGuideLines = false;
+        public static bool show_guidelines = false;
         private static int VAO, VBO;
         private readonly static float[] vertices =
         { 
@@ -117,7 +117,7 @@ namespace Engine.Common
 
         public static void Render()
         {
-            if (ShowGuideLines)
+            if (show_guidelines)
             {
                 GL.Disable(EnableCap.DepthTest);
 
