@@ -3,6 +3,7 @@ using WindowTemplate.Common;
 using Engine.Common;
 using Engine.Scene;
 using Engine.UI;
+using Engine.Debug;
 
 using ImGuiNET;
 
@@ -12,6 +13,8 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System.Diagnostics;
+
+using SN = System.Numerics;
 
 namespace Engine
 {
@@ -26,9 +29,9 @@ namespace Engine
 
         private static UI.ImGuiController UIController;
         public static StatCounter stats = new();
-        private bool show_statistics = false;
+        private bool show_statistics = true;
 
-        private static Camera viewport_camera;
+        public static Camera viewport_camera;
         Mesh mesh1;
         Mesh test_mesh;
         List<Mesh> test_meshes = new();
@@ -48,15 +51,16 @@ namespace Engine
             GL.FrontFace(FrontFaceDirection.Cw);
             GL.LineWidth(2.0f);
             GL.PointSize(5.0f);
+            GLFW.SetScrollCallback(WindowPtr, Scrolling);
 
             mesh1 = new Mesh("Assets/smooth_monkey.fbx")
             {
                 Rotation = new(-90, 0, 0)
             };
 
-            for (int X = 0; X < 6; X++)
+            for (int X = 0; X < 4; X++)
             {
-                for (int Y = 0; Y < 6; Y++)
+                for (int Y = 0; Y < 4; Y++)
                 {
                     test_mesh = new Mesh("Assets/smooth_monkey.fbx")
                     {
@@ -82,10 +86,9 @@ namespace Engine
                 UIController.WindowResized(window_size.X, window_size.Y);
             };
 
-            GLFW.SetScrollCallback(WindowPtr, Scrolling);
-
             UIController = new UI.ImGuiController(window_size.X, window_size.Y);
-            ImGui.GetIO().FontGlobalScale = 2.0f;
+            ImGui.GetIO().FontGlobalScale = 1.25f;  
+            UserInterface.LoadTheme();
 
             var watcher = new FileSystemWatcher($"{base_directory}Shaders");
             watcher.Changed += ShaderFileChanged;
@@ -117,7 +120,7 @@ namespace Engine
             base.OnRenderFrame(args);
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.ClearColor(0.05f, 0.05f, 0.05f, 1);
+            GL.ClearColor(0.03f, 0.03f, 0.03f, 1);
 
             stats.Count(args);
             viewport_camera.Update((float)args.Time);
@@ -131,7 +134,6 @@ namespace Engine
             mesh1.Render();
             foreach (Mesh mesh in test_meshes)
             {
-                default_S.Use();
                 default_S.SetMatrix4("model", mesh.model_matrix);
                 mesh.Render();
             }
@@ -140,60 +142,25 @@ namespace Engine
 
             UIController.Update(this, (float)args.Time);
 
-            if (show_statistics) RenderStatistics();
+            if (show_statistics) Debug.Debug.RenderStatistics();
+
+            if (ImGui.Begin("Buffer Debug", ImGuiWindowFlags.NoResize))
+            {
+                float ratio = 0.25f;
+                ImGui.SetWindowSize(new(window_size.X * ratio, window_size.Y * ratio + ImGui.GetFontSize() + 14));
+                // GL.BindTexture(TextureTarget.Texture2D, depthMap);
+                ImGui.GetForegroundDrawList().AddText(
+                    ImGui.GetWindowPos() + new SN.Vector2(12, ImGui.GetFontSize() + 14),
+                    ImGui.ColorConvertFloat4ToU32(new SN.Vector4(150, 150, 150, 255)),
+                    "Stencil"
+                );
+                ImGui.Image(nint.Zero, new(window_size.X * ratio, window_size.Y * ratio), new(0, 1), new(1, 0));
+                ImGui.End();
+            }
 
             UIController.Render();
 
             SwapBuffers();
-        }
-
-        public static void RenderStatistics()
-        {
-            float memory = 0.0f;
-            using (Process proc = Process.GetCurrentProcess())
-            {
-                // The proc.PrivateMemorySize64 will returns the private memory usage in byte.
-                // Would like to Convert it to Megabyte? divide it by 2^20
-                memory = proc.PrivateMemorySize64 / (1024 * 1024);
-            }
-
-            int free_video_memory = 0;
-            int total_video_memory = 0;
-            if (GLFW.ExtensionSupported("GL_NVX_gpu_memory_info") && GL.GetString(StringName.Vendor) == "NVIDIA Corporation")
-            {
-                total_video_memory = GL.GetInteger((GetPName)0x9048) / 1024;
-                free_video_memory = total_video_memory - GL.GetInteger((GetPName)0x9049) / 1024;
-            }
-
-            if (GLFW.ExtensionSupported("GL_ATI_meminfo") && GL.GetString(StringName.Vendor) == "AMD")
-            {
-
-            }
-
-            ImGui.GetForegroundDrawList().AddText(
-                new System.Numerics.Vector2(20, 20),
-                ImGui.ColorConvertFloat4ToU32(new System.Numerics.Vector4(150, 150, 150, 255)),
-                "gl-version: " + GL.GetString(StringName.Version) + "\n" +
-                "vendor: " + GL.GetString(StringName.Vendor) +
-                "\n\n" +
-                "window_size: " + window_size.X + " x " + window_size.Y + "\n" +
-                "aspect: " + window_aspect.ToString("0.000") +
-                "\n\n" +
-                "viewport_camera.direction:" + "\n" +
-                "X: " + viewport_camera.direction.X.ToString("0.000") + "\n" +
-                "Y: " + viewport_camera.direction.Y.ToString("0.000") + "\n" +
-                "Z: " + viewport_camera.direction.Z.ToString("0.000")
-                +"\n\n" +
-                "viewport_camera.position:" + "\n" +
-                "X: " + viewport_camera.position.X.ToString("0.000") + "\n" +
-                "Y: " + viewport_camera.position.Y.ToString("0.000") + "\n" +
-                "Z: " + viewport_camera.position.Z.ToString("0.000")
-                +"\n\n" +
-                "fps: " + stats.fps.ToString("0") + "\n" +
-                "latency: " + stats.ms.ToString("0.00") + " ms" +
-                "\n\n" +
-                "memory: " + memory + "mb" + "\n" + 
-                "gpu-memory: " + free_video_memory + " / " + total_video_memory + "mb");
         }
 
         protected override void OnKeyDown(KeyboardKeyEventArgs e)

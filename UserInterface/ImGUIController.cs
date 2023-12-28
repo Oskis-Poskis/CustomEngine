@@ -3,11 +3,13 @@ using ImPlotNET;
 using ImGuiNET;
 
 using System.Runtime.CompilerServices;
+using System.Diagnostics;
+
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-using System.Diagnostics;
+
 using ErrorCode = OpenTK.Graphics.OpenGL4.ErrorCode;
 using Keys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
 
@@ -518,7 +520,7 @@ void main()
             if (success == 0)
             {
                 string info = GL.GetProgramInfoLog(program);
-                Debug.WriteLine($"GL.LinkProgram had info log [{name}]:\n{info}");
+                System.Diagnostics.Debug.WriteLine($"GL.LinkProgram had info log [{name}]:\n{info}");
             }
 
             GL.DetachShader(program, vertex);
@@ -542,7 +544,7 @@ void main()
             if (success == 0)
             {
                 string info = GL.GetShaderInfoLog(shader);
-                Debug.WriteLine($"GL.CompileShader for shader '{name}' [{type}] had info log:\n{info}");
+                System.Diagnostics.Debug.WriteLine($"GL.CompileShader for shader '{name}' [{type}] had info log:\n{info}");
             }
 
             return shader;
@@ -554,7 +556,7 @@ void main()
             int i = 1;
             while ((error = GL.GetError()) != ErrorCode.NoError)
             {
-                Debug.Print($"{title} ({i++}): {error}");
+                System.Diagnostics.Debug.Print($"{title} ({i++}): {error}");
             }
         }
     }

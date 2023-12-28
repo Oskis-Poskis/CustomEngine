@@ -1,3 +1,6 @@
+using System.Reflection;
+using System.Runtime.InteropServices;
+
 using Assimp;
 using OpenTK.Mathematics;
 
@@ -57,6 +60,30 @@ namespace Engine.Common
             v.X = vec.X;
             v.Y = vec.Y;
             return v;
+        }
+    }
+
+    public static class DllResolver
+    {
+        static DllResolver()
+        {
+            NativeLibrary.SetDllImportResolver(typeof(Assimp.AssimpContext).Assembly, DllImportResolver);
+        }
+
+        public static void InitLoader() { }
+
+        public static IntPtr DllImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+        {
+            if (OperatingSystem.IsLinux())
+            {
+                if (NativeLibrary.TryLoad("/lib/x86_64-linux-gnu/libdl.so.2", assembly, searchPath, out IntPtr lib))
+                {
+                    Console.WriteLine("libdl.so.2 exists");
+                    return lib;
+                }
+            }
+
+            return IntPtr.Zero;
         }
     }
 }
