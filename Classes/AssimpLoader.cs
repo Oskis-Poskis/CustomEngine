@@ -67,7 +67,7 @@ namespace Engine.Common
     {
         static DllResolver()
         {
-            NativeLibrary.SetDllImportResolver(typeof(Assimp.AssimpContext).Assembly, DllImportResolver);
+            NativeLibrary.SetDllImportResolver(typeof(AssimpContext).Assembly, DllImportResolver);
         }
 
         public static void InitLoader() { }

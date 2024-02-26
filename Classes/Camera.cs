@@ -1,4 +1,3 @@
-using System;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -7,16 +6,17 @@ namespace Engine.Common
 {
     public class Camera
     {
-        public float aspect_ratio;
+        public float aspect_ratio = 1.0f;
         public Vector3 position = Vector3.Zero;
         public Vector3 direction = -Vector3.UnitZ;
         public Matrix4 projection, view;
 
         public float theta = -90, phi = 0;
         public float sensitivity = 0.3f;
+        public float zoom_sensitivity = 1.0f;
 
         public float speed;
-        public int FOV;
+        public int fov;
         private bool trackball = false;
         private float trackball_distance = 5.0f;
 
@@ -25,7 +25,6 @@ namespace Engine.Common
         private readonly float movement_interp_speed = 10.0f;
         private readonly float camera_interp_speed = 15.0f;
 
-        public static bool show_guidelines = false;
         private static int VAO, VBO;
         private readonly static float[] vertices =
         { 
@@ -35,14 +34,15 @@ namespace Engine.Common
              1.0f, -1.0f,
         };
 
-        public Camera(Vector3 position, Vector3 direction, int fov, float speed)
+        public Camera(Vector3 Position, Vector3 Direction, int FOV, float Speed)
         {
-            this.position = position;
-            target_position = position;
-            this.direction = direction;
-            target_direction = direction;
-            this.speed = speed;
-            FOV = fov;
+            position = Position;
+            target_position =Position;
+            direction = Direction;
+            target_direction = Direction;
+            
+            speed = Speed;
+            fov = FOV;
 
             projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(FOV), 1, 0.1f, 1000.0f);
             view = Matrix4.LookAt(Vector3.Zero, -Vector3.UnitZ, Vector3.UnitY);
@@ -56,6 +56,12 @@ namespace Engine.Common
 
             GL.EnableVertexAttribArray(0);
             GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, 2 * sizeof(float), 0);
+        }
+
+        public void Zoom(float offset)
+        {
+            position = position + offset * direction * zoom_sensitivity;
+            target_position = target_position + offset * target_direction * zoom_sensitivity;
         }
 
         public void Input(Vector2 delta, bool trackball)
@@ -109,24 +115,8 @@ namespace Engine.Common
             position = trackball ? target_position : Vector3.Lerp(position, target_position, movement_interp_speed * delta);
             direction = trackball ? target_direction : Vector3.Lerp(direction, target_direction, camera_interp_speed * delta);
 
-            projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(FOV), aspect_ratio, 0.1f, 1000.0f);
+            projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fov), aspect_ratio, 0.1f, 1000.0f);
             view = Matrix4.LookAt(position, position + direction, Vector3.UnitY);
-
-            // Console.WriteLine(direction.ToString("0.00"));
-        }
-
-        public static void Render()
-        {
-            if (show_guidelines)
-            {
-                GL.Disable(EnableCap.DepthTest);
-
-                AppWindow.guidelines_S.Use();
-                GL.BindVertexArray(VAO);
-                GL.DrawArrays(PrimitiveType.LineLoop, 0, 4);
-
-                GL.Enable(EnableCap.DepthTest);
-            }
         }
     }
 }
