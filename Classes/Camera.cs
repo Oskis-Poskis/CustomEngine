@@ -11,7 +11,7 @@ namespace Engine.Common
         public Vector3 direction = -Vector3.UnitZ;
         public Matrix4 projection, view;
 
-        public float theta = -90, phi = 0;
+        public float theta = -90, phi = -45;
         public float sensitivity = 0.3f;
         public float zoom_sensitivity = 1.0f;
 
